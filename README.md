@@ -1,7 +1,7 @@
 # trade_bot_binance
 Siga a sequência de passos a seguir para usar o "trade_bot"
 
-**Passo 1**: Crie uma sua API de gerenciamento na Binance
+**Passo 1**: Crie uma sua API de gerenciamento na Binance ([detalhes aqui](https://www.binance.com/en/support/faq/360002502072))
 
 **Passo 2**: Baixe os arquivos desse repositório
 
