@@ -1,4 +1,6 @@
-# trade_bot_binance
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+# Bot para Trade na Binance
 Siga a sequência de passos a seguir para usar o "trade_bot"
 
 **Passo 1**: Baixe os arquivos desse repositório.
@@ -17,6 +19,3 @@ Investimentos envolvem riscos e os investidores devem ter prudência ao tomar su
 
 Este documento não pode ser reproduzido ou distribuído por qualquer pessoa, parcialmente ou em sua totalidade, sem o prévio consentimento
 por escrito do Autor. 
-
-
-
