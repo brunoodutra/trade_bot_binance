@@ -1,26 +1,20 @@
 
 import numpy as np
 import requests
-from tradingview_ta import TA_Handler, Interval, Exchange
 import re
-import websocket, json, pprint, numpy
+import pandas as pd
+from math import floor
 
 from requests import ReadTimeout, ConnectTimeout, HTTPError, Timeout, ConnectionError
-
-from pip._internal import main as install
-import os.path
-from datetime import datetime
-import pytz
-# Import module
-import threading
 import time
+
 # Importar bibliotecas necessárias da binance
 from binance.exceptions import BinanceAPIException # here
 from binance.helpers import round_step_size
 from binance.client import Client
 from binance.enums import *
-import pandas as pd
-from math import floor
+
+
 
 def Map( x,  in_min,  in_max,  out_min,  out_max):
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
