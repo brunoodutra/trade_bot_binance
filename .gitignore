@@ -7,3 +7,6 @@ venv/
 
 # cache
 __pycache__/
+
+# csv de históricos
+*.csv
