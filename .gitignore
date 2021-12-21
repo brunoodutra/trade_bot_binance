@@ -2,5 +2,5 @@
 credentials.json
 
 # virtual environments
-venv
-.venv
+venv/
+.venv/
