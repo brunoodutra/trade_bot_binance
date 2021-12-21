@@ -9,7 +9,7 @@ from requests import ReadTimeout, ConnectTimeout, HTTPError, Timeout, Connection
 import time
 
 # Importar bibliotecas necessárias da binance
-from binance.exceptions import BinanceAPIException # here
+from binance.exceptions import BinanceAPIException
 from binance.helpers import round_step_size
 from binance.client import Client
 from binance.enums import *
