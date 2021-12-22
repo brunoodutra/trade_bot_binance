@@ -17,6 +17,7 @@ from datetime import datetime
 import pytz
 import config_My_API
 
+import logging
 
 
 client_binance= Client(api_key=config_My_API.api_key, api_secret=config_My_API.api_secret)
@@ -58,14 +59,14 @@ class Main(QtWidgets.QMainWindow):
 
     def Venda(self):
         self.pushButton_venda.setEnabled(False)
-        print('apertou vender ')
+        logging.INFO("apertou vender")
         self.pushButton_venda.setDisabled(True)
         #self.pushButton_compra.setEnabled(False)
         self.t.event_Venda()
         #self.Life_bot()
     def Compra(self):
         self.pushButton_compra.setEnabled(False)
-        print('apertou Comprar ')
+        logging.INFO("apertou comprar")
         self.pushButton_compra.setDisabled(True)
         #self.pushButton_compra.setEnabled(False)
         self.t.event_Compra()
@@ -215,7 +216,7 @@ class wait_trade(QtCore.QObject):
         if os.path.isfile(self.arquivo):
             self.trades_finalizados=pd.read_csv(self.arquivo,index_col=False) 
         else:
-            print('Criando base de dados para:', self.Crypto)
+            logging.INFO(f"Criando base de dados para: {self.Crypto}")
             dia = self.today.strftime("%d/%m/%Y")
             horario = self.today.strftime("%H:%M:%S")
             data_pd={'Crypto':[self.Crypto],'Status':['NEUTRAL'],'Price':[0],'Quantity':[0],'Day':[dia],'HOUR':[horario]}
@@ -223,7 +224,7 @@ class wait_trade(QtCore.QObject):
             self.trades_finalizados.to_csv(self.arquivo, index=False)
             
         self.status_trade=self.trades_finalizados['Status'][self.trades_finalizados.index[-1]]
-        print('ultímo status:',self.status_trade)
+        logging.INFO(f"último status:  {self.status_trade}")
         if 'BUY' in self.status_trade:
             self.valor_de_compra=self.trades_finalizados['Price'][self.trades_finalizados.index[-1]]
             self.Aviso_valor.emit('Valor de Compra: ' + str(self.valor_de_compra))
@@ -255,7 +256,7 @@ class wait_trade(QtCore.QObject):
         self.begin()
         self.Quantity, self.Trade, self.preco_medio = Trade_bot.main(self.Set_status,self.Aviso,self.client_binance,self.Crypto,self.investimento_max,self.Quantity)
         #self.Aviso_quantidade.emit(str(self.Quantity))
-        print('Quantidade:',str(self.Quantity))
+        logging.INFO(f"Quantidade: {str(self.Quantity)}")
        # try:
         while True:
             if self.Trade:
@@ -275,12 +276,12 @@ class wait_trade(QtCore.QObject):
                     time.sleep(20)
 
             if self.venda == True:
-                    print('vendido!')
+                    logging.INFO("Ativo vendido!")
                     self.venda=False
                     self.Set_Button_Venda.emit(False)
                     self.Set_Button_Compra.emit(True)
             if self.compra == True: 
-                    print('comprado!')
+                    logging.INFO("Ativo comprado!")
                     self.compra=False
                     #self.Set_Button_Venda.emit(True)
                     self.Set_Button_Compra.emit(False)
@@ -295,7 +296,7 @@ class wait_trade(QtCore.QObject):
 
     def event_Venda(self):
         self.venda=True
-        print('venda autorizada')
+        logging.INFO("venda autorizada")
         try:
                     self.Venda_lucro=True
                     self.status_trade='NEUTRAL'
@@ -305,7 +306,7 @@ class wait_trade(QtCore.QObject):
                     self.Aviso_valor.emit('Valor de venda: '+str(self.valor_de_venda))
                     self.Set_status.emit(3)
                     #self.Aviso_quantidade.emit(str(0))
-                    print('Esperando oportunidade de compra')
+                    logging.INFO('Esperando oportunidade de compra')
                     self.Aviso.emit('Esperando oportunidade de compra')
                     self.Set_status.emit(1)
                     self.tradingview.interval=self.temp 
@@ -318,7 +319,7 @@ class wait_trade(QtCore.QObject):
 
     def event_Compra(self):
         self.compra=True
-        print('Compra Autorizada')
+        logging.INFO("Compra Autorizada")
         try:
                     self.Venda_lucro=False
                     self.status_trade='BUY'
@@ -331,11 +332,11 @@ class wait_trade(QtCore.QObject):
                     #self.tradingview.interval=self.temp 
                     #self.Set_Button_Compra.emit(False)
                     
-                    print('Comprando ativo')
+                    logging.INFO("Comprando ativo")
                    
                     order_ = self.client_binance.order_market_buy(symbol=self.Crypto,quantity=self.Quantity)
                     self.valor_de_compra=float(order_['fills'][0]['price'])
-                    print('Valor de compra',self.valor_de_compra)
+                    logging.INFO(f"Valor de compra: {self.valor_de_compra}")
                     self.Aviso_valor.emit('Valor de compra: '+str(self.valor_de_compra))
                     self.Set_status.emit(2)
 
@@ -351,25 +352,23 @@ class wait_trade(QtCore.QObject):
                     self.Set_Button_Compra.emit(False)
 
         except BinanceAPIException as e:
-            print(e.status_code)
-            print(e.message)
+            # loga no console
+            logging.exception(f"Erro de status code {e.status_code}. Traceback abaixo.")
             self.Aviso.emit(e.message)
                     
         try: 
-                print('Quantidade',float(order_['origQty']))
+                logging.INFO(f"Quantidade: {float(order_['origQty'])}")
                 Quantity=float(order_['executedQty'])
-                print('Quantidade comprada',self.Quantity)
-                print(order_)
+                logging.INFO(f"Quantidade comprada: {self.Quantity}")
+                logging.INFO(order_)
 
         except BinanceAPIException as e:
-                print(e.status_code)
-                print(e.message)
-                self.Aviso.emit(e.message)
+            # loga no console
+            logging.exception(f"Erro de status code {e.status_code}. Traceback abaixo.")
+            self.Aviso.emit(e.message)
         
         self.Aviso_quantidade.emit(str(self.Quantity))
                     
-
-        
 
     def kill(self):
         self._kill.set()

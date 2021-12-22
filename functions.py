@@ -20,7 +20,9 @@ from binance.helpers import round_step_size
 from binance.client import Client
 from binance.enums import *
 import pandas as pd
-from math import floor
+from math import floor, log
+
+import logging
 
 def Map( x,  in_min,  in_max,  out_min,  out_max):
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
@@ -33,8 +35,9 @@ def Sentimento_do_mercado(investimento_max):
         caixa= np.round(Map(int(data['data'][0]['value']),1,100,10,investimento_max))
         return caixa
     except (ConnectTimeout, HTTPError, ReadTimeout, Timeout, ConnectionError):
-        print(ReadTimeout)
-        print("Problema de conexão")
+        # loga no console
+        logging.exception(f"Erro de conexão. Traceback abaixo.")
+        
         return investimento_max-50
 
 # Função para obter os valores floats a partir de strings
@@ -48,15 +51,15 @@ def STR2FLOAT(STR,tick_size):
 
 def Venda_trade(arquivo,client_binance,Crypto,Quantity,recommendation,valor_de_compra,trades_finalizados,today):
     
-    print('Vendendo ativo')
-    print('Quantidade:', Quantity)
+    logging.INFO("Vendendo ativo")
+    logging.INFO(f"Quantidade: {Quantity}")
     try:
         order_ = client_binance.order_market_sell(symbol=Crypto,quantity=Quantity)
         valor_de_venda=float(order_['fills'][0]['price'])
-        print('Valor de venda',valor_de_venda)
+        logging.INFO("Valor de venda {valor_de_venda}")
         porcentagem=(valor_de_venda-valor_de_compra)*100/valor_de_compra
         
-        print(Crypto+":",'Tive lucro/preju de:',porcentagem,"%")
+        logging.INFO(f"{Crypto}: Tive lucro/preju de: {round(porcentagem, 4)}%")
         
         dia = today.strftime("%d/%m/%Y")
         horario = today.strftime("%H:%M:%S")
@@ -66,9 +69,8 @@ def Venda_trade(arquivo,client_binance,Crypto,Quantity,recommendation,valor_de_c
         return valor_de_venda, porcentagem
 
     except BinanceAPIException as e:
-            print(e.status_code)
-            print(e.message)
-            porcentagem=(valor_de_venda-valor_de_compra)*100/valor_de_compra
+        logging.exception(f"Erro da Binance, status code {e.status_code}. Traceback abaixo.")
+        porcentagem=(valor_de_venda-valor_de_compra)*100/valor_de_compra
 
 def Trade_bot(Aviso_valor_atual,Set_status,Aviso_valor,Aviso_quantidade,Aviso,client_binance,Crypto,Quantity,preco_atual,temp,today,tradingview, Venda_lucro, recommendation,arquivo, espera, status_trade, trades_finalizados, valor_de_compra, valor_de_venda,Trade,porcentagem,Set_Button_Venda):
      # try:
@@ -79,14 +81,14 @@ def Trade_bot(Aviso_valor_atual,Set_status,Aviso_valor,Aviso_quantidade,Aviso,cl
         Aviso_valor_atual.emit('Preço atual: '+str(preco_atual))
     
     except (ConnectTimeout, HTTPError, ReadTimeout, Timeout, ConnectionError):
-            print(ReadTimeout)
-            print("Problema de conexão")
-            Trade=False
-            time.sleep(10)
+        # loga no console
+        logging.exception(f"Erro de conexão. Traceback abaixo.")
+        Trade=False
+        time.sleep(10)
 
     if 'SELL' in recommendation and (('SELL') in status_trade or ('NEUTRAL') in status_trade):
         if espera==False:
-            print('Esperando oportunidade de compra')
+            logging.INFO("Esperando oportunidade de compra")
             Set_status.emit(1)
             Aviso.emit('Esperando oportunidade de compra')
         espera=True
@@ -114,12 +116,12 @@ def Trade_bot(Aviso_valor_atual,Set_status,Aviso_valor,Aviso_quantidade,Aviso,cl
             
         
     elif 'BUY' in recommendation and 'SELL' in status_trade and Venda_lucro==False:
-        print('Comprando ativo')
+        logging.INFO("Comprando ativo")
 
         try:
             order_ = client_binance.order_market_buy(symbol=Crypto,quantity=Quantity)
             valor_de_compra=float(order_['fills'][0]['price'])
-            print('Valor de compra',valor_de_compra)
+            logging.INFO("Valor de compra: {valor_de_compra}")
             Aviso_valor.emit('Valor de compra: '+str(valor_de_compra))
             Set_status.emit(2)
 
@@ -134,19 +136,17 @@ def Trade_bot(Aviso_valor_atual,Set_status,Aviso_valor,Aviso_quantidade,Aviso,cl
             Set_Button_Venda.emit(True)
 
         except BinanceAPIException as e:
-            print(e.status_code)
-            print(e.message)
+            logging.exception(f"Erro da Binance, status code {e.status_code}. Traceback abaixo.")
             Aviso.emit(e.message)
             
         try: 
-            print('Quantidade',float(order_['origQty']))
+            logging.INFO(f"Quantidade: {float(order_['origQty'])}")
             Quantity=float(order_['executedQty'])
-            print('Quantidade comprada',Quantity)
-            print(order_)
+            logging.INFO(f"Quantidade comprada: {Quantity}")
+            logging.INFO(order_)
 
         except BinanceAPIException as e:
-            print(e.status_code)
-            print(e.message)
+            logging.exception(f"Erro da Binance, status code {e.status_code}. Traceback abaixo.")
             Aviso.emit(e.message)
         
         Aviso_quantidade.emit(str(Quantity))
@@ -172,13 +172,13 @@ def Trade_bot(Aviso_valor_atual,Set_status,Aviso_valor,Aviso_quantidade,Aviso,cl
                                         trades_finalizados,today)
             Aviso_valor.emit('Valor de venda: '+str(valor_de_venda))
             Set_status.emit(3)
-            print('Esperando oportunidade de compra')
+            logging.INFO("Esperando oportunidade de compra")
             Aviso.emit('Esperando oportunidade de compra')
             Set_status.emit(1)
             tradingview.interval=temp 
             
         if espera==False:
-            print('Esperando ativo valorizar mais')
+            logging.INFO("Esperando ativo valorizar mais")
             Aviso.emit('Esperando ativo valorizar mais')
             status_trade=recommendation
             Set_Button_Venda.emit(True)
@@ -186,7 +186,7 @@ def Trade_bot(Aviso_valor_atual,Set_status,Aviso_valor,Aviso_quantidade,Aviso,cl
         espera=True
     elif 'BUY' in recommendation and 'NEUTRAL' in status_trade and Venda_lucro==False:
             if espera==False:
-                print('Ativo muito valorizado, estou esperando oportunidade de compra')
+                logging.INFO("Ativo muito valorizado, estou esperando oportunidade de compra")
                 Aviso.emit('Ativo muito valorizado, estou esperando oportunidade de compra')
                 Set_status.emit(1)
             espera=True
@@ -223,19 +223,17 @@ def main(Set_status,Aviso,client_binance,Crypto,investimento_max,Quantity):
             #Quantity=round(Quantity)
             
 
-    print('quantidade:',Quantity)
+    logging.INFO(f"Quantidade:: {Quantity}")
     if 'USDT' in Crypto   and float(saldo_usdt['free']) > 1 and valor_do_trade>10:
-         print("Iniciando o trade de: ",Crypto)
-         print("Com valor de caixa de: ",valor_do_trade)
+         logging.INFO(f"Iniciando o trade de: {Crypto}, com valor de caixa de: {valor_do_trade}")
          Trade=True
          #Trade_bot(Crypto,Quantity)
     elif 'BTC' in Crypto   and float(saldo_btc['free']) > 0:
-         print("Iniciando o trade de: ",Crypto)
-         print("Com valor de caixa de: ",valor_do_trade)
+         logging.INFO(f"Iniciando o trade de: {Crypto}, com valor de caixa de: {valor_do_trade}")
          Trade=True
          #Trade_bot(Crypto,Quantity)
     else: 
-        print("Saldo insuficiente ou o tamanho da ordem é menor que 10$ usdt ou o par não é com USDT")
+        logging.WARNING("Saldo insuficiente ou o tamanho da ordem é menor que 10$ usdt ou o par não é com USDT")
         Aviso.emit('Saldo insuficiente' )
         Set_status.emit(1)
         Trade= False
