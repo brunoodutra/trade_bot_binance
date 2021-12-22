@@ -1,0 +1,12 @@
+# arquivo de credenciais
+credentials.json
+
+# virtual environments
+venv/
+.venv/
+
+# cache
+__pycache__/
+
+# csv de históricos
+*.csv
