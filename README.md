@@ -5,7 +5,13 @@ Siga a sequência de passos a seguir para usar o "trade_bot"
 
 **Passo 1**: Baixe os arquivos desse repositório.
 
-**Passo 2**: Crie uma sua API de gerenciamento na Binance ([detalhes aqui](https://www.binance.com/en/support/faq/360002502072)). Não esqueça de habilitar a opção _Enable Spot & Margin Trading_ e, de preferência, limitar o uso apenas para o seu IP. Guarde as credenciais no arquivo `credentials.json`.
+**Passo 2**: Crie uma sua API de gerenciamento na Binance ([detalhes aqui](https://www.binance.com/en/support/faq/360002502072)). Não esqueça de habilitar a opção _Enable Spot & Margin Trading_ e, de preferência, limitar o uso apenas para o seu IP. Guarde as credenciais no arquivo `credentials.json`, no formato 
+```
+{
+    "API_KEY":  "XYZ", 
+    "API_SECRET": "XYZ"
+}
+```
 
 **Passo 4**: Em seguida rode o arquivo principal "main_unit.py", ou execute o arquivo executável "execultavel.bat".
 
