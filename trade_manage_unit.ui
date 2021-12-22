@@ -451,7 +451,7 @@ color: rgb(220,220,220);</string>
       <string notr="true">background-color: rgb(250, 250, 250);</string>
      </property>
      <property name="text">
-      <string>250</string>
+      <string>10</string>
      </property>
     </widget>
     <widget class="QGroupBox" name="groupBox_aviso">
