@@ -19,3 +19,7 @@ Investimentos envolvem riscos e os investidores devem ter prudência ao tomar su
 
 Este documento não pode ser reproduzido ou distribuído por qualquer pessoa, parcialmente ou em sua totalidade, sem o prévio consentimento
 por escrito do Autor. 
+
+### Formatação 
+
+Para manter uma formatação padronizada de código e para melhor legibilidade, o projeto usa a biblioteca [black](https://github.com/psf/black). Sempre que for sugerir mudanças, rode o comando `black .` para que todo o projeto seja formatado. Se desejar apenas visualizar onde tem mudanças sugeridas pela bilbioteca, use `black . --check`.
