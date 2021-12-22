@@ -1,25 +1,27 @@
 import sys
+import os.path
+import json
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 import numpy as np
-# Importar bibliotecas necessárias da thread
-import threading
-import time
-# Importar bibliotecas necessárias da binance
-from binance.exceptions import BinanceAPIException # here
-from binance.helpers import round_step_size
-from binance.client import Client
-from binance.enums import *
-import functions as Trade_bot
-from tradingview_ta import TA_Handler, Interval, Exchange
-import os.path
 import pandas as pd
 from datetime import datetime
 import pytz
-import config_My_API
 
 
+# Importar bibliotecas necessárias da thread
+import threading
+import time
 
-client_binance= Client(api_key=config_My_API.api_key, api_secret=config_My_API.api_secret)
+# Importar bibliotecas necessárias da binance
+from binance.exceptions import BinanceAPIException
+from binance.client import Client
+from binance.enums import *
+import functions as Trade_bot
+from tradingview_ta import TA_Handler
+
+
+credentials =  json.load(open(f"./credentials.json"))
+client_binance= Client(api_key=credentials.get("API_KEY"), api_secret=credentials.get("API_SECRET"))
 
 
 class Main(QtWidgets.QMainWindow):     
