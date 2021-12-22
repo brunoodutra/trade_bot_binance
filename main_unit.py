@@ -18,7 +18,7 @@ import pytz
 import config_My_API
 
 import logging
-
+logger = logging.getLogger('Trading Bot')
 
 client_binance= Client(api_key=config_My_API.api_key, api_secret=config_My_API.api_secret)
 
@@ -59,14 +59,14 @@ class Main(QtWidgets.QMainWindow):
 
     def Venda(self):
         self.pushButton_venda.setEnabled(False)
-        logging.INFO("apertou vender")
+        logger.info("apertou vender")
         self.pushButton_venda.setDisabled(True)
         #self.pushButton_compra.setEnabled(False)
         self.t.event_Venda()
         #self.Life_bot()
     def Compra(self):
         self.pushButton_compra.setEnabled(False)
-        logging.INFO("apertou comprar")
+        logger.info("apertou comprar")
         self.pushButton_compra.setDisabled(True)
         #self.pushButton_compra.setEnabled(False)
         self.t.event_Compra()
@@ -216,7 +216,7 @@ class wait_trade(QtCore.QObject):
         if os.path.isfile(self.arquivo):
             self.trades_finalizados=pd.read_csv(self.arquivo,index_col=False) 
         else:
-            logging.INFO(f"Criando base de dados para: {self.Crypto}")
+            logger.info(f"Criando base de dados para: {self.Crypto}")
             dia = self.today.strftime("%d/%m/%Y")
             horario = self.today.strftime("%H:%M:%S")
             data_pd={'Crypto':[self.Crypto],'Status':['NEUTRAL'],'Price':[0],'Quantity':[0],'Day':[dia],'HOUR':[horario]}
@@ -224,7 +224,7 @@ class wait_trade(QtCore.QObject):
             self.trades_finalizados.to_csv(self.arquivo, index=False)
             
         self.status_trade=self.trades_finalizados['Status'][self.trades_finalizados.index[-1]]
-        logging.INFO(f"último status:  {self.status_trade}")
+        logger.info(f"último status:  {self.status_trade}")
         if 'BUY' in self.status_trade:
             self.valor_de_compra=self.trades_finalizados['Price'][self.trades_finalizados.index[-1]]
             self.Aviso_valor.emit('Valor de Compra: ' + str(self.valor_de_compra))
@@ -256,7 +256,7 @@ class wait_trade(QtCore.QObject):
         self.begin()
         self.Quantity, self.Trade, self.preco_medio = Trade_bot.main(self.Set_status,self.Aviso,self.client_binance,self.Crypto,self.investimento_max,self.Quantity)
         #self.Aviso_quantidade.emit(str(self.Quantity))
-        logging.INFO(f"Quantidade: {str(self.Quantity)}")
+        logger.info(f"Quantidade: {str(self.Quantity)}")
        # try:
         while True:
             if self.Trade:
@@ -276,12 +276,12 @@ class wait_trade(QtCore.QObject):
                     time.sleep(20)
 
             if self.venda == True:
-                    logging.INFO("Ativo vendido!")
+                    logger.info("Ativo vendido!")
                     self.venda=False
                     self.Set_Button_Venda.emit(False)
                     self.Set_Button_Compra.emit(True)
             if self.compra == True: 
-                    logging.INFO("Ativo comprado!")
+                    logger.info("Ativo comprado!")
                     self.compra=False
                     #self.Set_Button_Venda.emit(True)
                     self.Set_Button_Compra.emit(False)
@@ -296,7 +296,7 @@ class wait_trade(QtCore.QObject):
 
     def event_Venda(self):
         self.venda=True
-        logging.INFO("venda autorizada")
+        logger.info("venda autorizada")
         try:
                     self.Venda_lucro=True
                     self.status_trade='NEUTRAL'
@@ -306,7 +306,7 @@ class wait_trade(QtCore.QObject):
                     self.Aviso_valor.emit('Valor de venda: '+str(self.valor_de_venda))
                     self.Set_status.emit(3)
                     #self.Aviso_quantidade.emit(str(0))
-                    logging.INFO('Esperando oportunidade de compra')
+                    logger.info('Esperando oportunidade de compra')
                     self.Aviso.emit('Esperando oportunidade de compra')
                     self.Set_status.emit(1)
                     self.tradingview.interval=self.temp 
@@ -319,7 +319,7 @@ class wait_trade(QtCore.QObject):
 
     def event_Compra(self):
         self.compra=True
-        logging.INFO("Compra Autorizada")
+        logger.info("Compra Autorizada")
         try:
                     self.Venda_lucro=False
                     self.status_trade='BUY'
@@ -332,11 +332,11 @@ class wait_trade(QtCore.QObject):
                     #self.tradingview.interval=self.temp 
                     #self.Set_Button_Compra.emit(False)
                     
-                    logging.INFO("Comprando ativo")
+                    logger.info("Comprando ativo")
                    
                     order_ = self.client_binance.order_market_buy(symbol=self.Crypto,quantity=self.Quantity)
                     self.valor_de_compra=float(order_['fills'][0]['price'])
-                    logging.INFO(f"Valor de compra: {self.valor_de_compra}")
+                    logger.info(f"Valor de compra: {self.valor_de_compra}")
                     self.Aviso_valor.emit('Valor de compra: '+str(self.valor_de_compra))
                     self.Set_status.emit(2)
 
@@ -353,18 +353,18 @@ class wait_trade(QtCore.QObject):
 
         except BinanceAPIException as e:
             # loga no console
-            logging.exception(f"Erro de status code {e.status_code}. Traceback abaixo.")
+            logger.exception(f"Erro de status code {e.status_code}. Traceback abaixo.")
             self.Aviso.emit(e.message)
                     
         try: 
-                logging.INFO(f"Quantidade: {float(order_['origQty'])}")
+                logger.info(f"Quantidade: {float(order_['origQty'])}")
                 Quantity=float(order_['executedQty'])
-                logging.INFO(f"Quantidade comprada: {self.Quantity}")
-                logging.INFO(order_)
+                logger.info(f"Quantidade comprada: {self.Quantity}")
+                logger.info(order_)
 
         except BinanceAPIException as e:
             # loga no console
-            logging.exception(f"Erro de status code {e.status_code}. Traceback abaixo.")
+            logger.exception(f"Erro de status code {e.status_code}. Traceback abaixo.")
             self.Aviso.emit(e.message)
         
         self.Aviso_quantidade.emit(str(self.Quantity))
