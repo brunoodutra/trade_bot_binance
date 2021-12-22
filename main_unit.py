@@ -67,7 +67,7 @@ class Main(QtWidgets.QMainWindow):
         #self.Life_bot()
     def Compra(self):
         self.pushButton_compra.setEnabled(False)
-        print('apertou vender ')
+        print('apertou Comprar ')
         self.pushButton_compra.setDisabled(True)
         #self.pushButton_compra.setEnabled(False)
         self.t.event_Compra()
@@ -357,18 +357,18 @@ class wait_trade(QtCore.QObject):
             print(e.message)
             self.Aviso.emit(e.message)
                     
-            try: 
+        try: 
                 print('Quantidade',float(order_['origQty']))
                 Quantity=float(order_['executedQty'])
                 print('Quantidade comprada',self.Quantity)
                 print(order_)
 
-            except BinanceAPIException as e:
+        except BinanceAPIException as e:
                 print(e.status_code)
                 print(e.message)
                 self.Aviso.emit(e.message)
         
-            self.Aviso_quantidade.emit(str(self.Quantity))
+        self.Aviso_quantidade.emit(str(self.Quantity))
                     
 
         
