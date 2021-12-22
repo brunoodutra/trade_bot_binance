@@ -24,12 +24,15 @@ import pandas as pd
 from math import floor, log
 
 import logging
-
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger("Trading Bot")
 
 
-def Map(x, in_min, in_max, out_min, out_max):
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+def Map(x, in_min, in_max, out_min, out_max) -> int:
+    return int ( (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min )
 
 
 def Sentimento_do_mercado(investimento_max):
