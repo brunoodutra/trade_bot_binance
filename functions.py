@@ -23,12 +23,8 @@ from binance.enums import *
 import pandas as pd
 from math import floor, log
 
-import logging
-logging.basicConfig(
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
-    datefmt='%Y-%m-%d %H:%M:%S')
-logger = logging.getLogger("Trading Bot")
+from coloredlogs import CustomFormatter
+logger = CustomFormatter().get_colored_logger()
 
 
 def Map(x, in_min, in_max, out_min, out_max) -> int:

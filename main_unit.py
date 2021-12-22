@@ -19,18 +19,14 @@ from datetime import datetime
 import pytz
 import json
 
-import logging
-logging.basicConfig(
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
-    datefmt='%Y-%m-%d %H:%M:%S')
-logger = logging.getLogger("Trading Bot")
+from coloredlogs import CustomFormatter
+logger = CustomFormatter().get_colored_logger()
+
 
 credentials = json.load(open(f"./credentials.json"))
 client_binance = Client(
     api_key=credentials.get("API_KEY"), api_secret=credentials.get("API_SECRET")
 )
-
 
 class Main(QtWidgets.QMainWindow):
     global client_binance
@@ -246,7 +242,7 @@ class wait_trade(QtCore.QObject):
         self.status_trade = self.trades_finalizados["Status"][
             self.trades_finalizados.index[-1]
         ]
-        logger.info(f"último status:  {self.status_trade}")
+        logger.warning(f"último status:  {self.status_trade}")
         if "BUY" in self.status_trade:
             self.valor_de_compra = self.trades_finalizados["Price"][
                 self.trades_finalizados.index[-1]
