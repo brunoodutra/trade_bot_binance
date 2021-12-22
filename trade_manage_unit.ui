@@ -517,7 +517,7 @@ color: rgb(220,220,220);</string>
       <string>sentimento do mercado</string>
      </property>
      <property name="checked">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QPushButton" name="pushButton_venda">
