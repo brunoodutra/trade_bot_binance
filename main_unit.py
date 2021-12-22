@@ -15,12 +15,13 @@ import os.path
 import pandas as pd
 from datetime import datetime
 import pytz
-import config_My_API
+import json
 
 import logging
 logger = logging.getLogger('Trading Bot')
 
-client_binance= Client(api_key=config_My_API.api_key, api_secret=config_My_API.api_secret)
+credentials =  json.load(open(f"./credentials.json"))
+client_binance= Client(api_key=credentials.get("API_KEY"), api_secret=credentials.get("API_SECRET"))
 
 
 class Main(QtWidgets.QMainWindow):     
